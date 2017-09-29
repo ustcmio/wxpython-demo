@@ -1,57 +1,63 @@
 import wx
-from wx.grid import Grid
+from searchPanel import SearchPanel
+from leftPanel import LeftPanel
+from checkPanel import CheckPanel
+from updataPanel import UpdataPanel
+from searchPanel_offline import SearchPanelByOffline
 
 
 class MainScreen(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, size=wx.Size(1280, 800))
+        # 窗口居中
         self.CenterOnScreen()
+        # 分割窗口
         self.sp = wx.SplitterWindow(self)
+        # Top窗口：panel
         self.p_top = wx.Panel(self.sp, style=wx.SUNKEN_BORDER)
         self.p_top.Hide()
+        # 下部分窗口：左右分割的splitter
         self.sp_main = wx.SplitterWindow(self.sp)
+        # 上下两部分窗口填充
         self.sp.SplitHorizontally(self.p_top, self.sp_main, sashPosition=self.GetSize()[1] / 6)
 
-        self.p_left = wx.Panel(self.sp_main, style=wx.SUNKEN_BORDER)
-        self.p_left.SetBackgroundColour('#E0FFFF')
-        self.p_main = wx.Panel(self.sp_main, style=wx.SUNKEN_BORDER)
-        self.p_main.SetBackgroundColour('#E0FFFF')
+        # 下部分窗口的left:panel
+        self.p_left = LeftPanel(self.sp_main, style=wx.SUNKEN_BORDER)
         self.p_left.Hide()
-        self.p_main.Hide()
-        self.sp_main.SplitVertically(self.p_left, self.p_main, sashPosition=self.GetSize()[0] / 6)
+        # 下部分窗口的right：panel
+        self.p_mains = [SearchPanel(self.sp_main, style=wx.SUNKEN_BORDER),
+                        CheckPanel(self.sp_main, style=wx.SUNKEN_BORDER),
+                        UpdataPanel(self.sp_main, style=wx.SUNKEN_BORDER),
+                        SearchPanelByOffline(self.sp_main, style=wx.SUNKEN_BORDER)
+                        ]
+        for p in self.p_mains:
+            p.Hide()
 
-        self.btn_s1 = wx.Button(self.p_left, size=wx.Size(60, 40), label='查询')
-        self.btn_s1.SetBackgroundColour('#9AFF9A')
-        self.btn_s2 = wx.Button(self.p_left, size=wx.Size(60, 40), label='审核')
-        self.btn_s2.SetBackgroundColour('#9AFF9A')
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add((50, 5))
-        self.sizer.Add(self.btn_s1, flag=wx.EXPAND)
-        self.sizer.Add((50, 5))
-        self.sizer.Add(self.btn_s2, flag=wx.EXPAND)
-        self.p_left.SetSizer(self.sizer)
+        # 下部分窗口默认填充查询页面
+        self.sp_main.SplitVertically(self.p_left, self.p_mains[0], sashPosition=self.GetSize()[0] / 6)
+        self.main_index = 0
 
-        self.Bind(wx.EVT_BUTTON, self.OnClick, self.btn_s1)
-
-        sizer_s = wx.BoxSizer(wx.VERTICAL)
-        sizer_s_top = wx.BoxSizer(wx.HORIZONTAL)
-
-        sizer_s_top.Add(wx.StaticText(self.p_main,label='姓名:   '),flag=wx.ALIGN_CENTER | wx.ALL^wx.RIGHT,border=40)
-        sizer_s_top.Add(wx.TextCtrl(self.p_main,size=(150,-1)), flag=wx.ALIGN_CENTER)
-        sizer_s_top.Add(wx.StaticText(self.p_main, label='身份证号:   '), flag=wx.ALIGN_CENTER | wx.ALL^wx.RIGHT, border=40)
-        sizer_s_top.Add(wx.TextCtrl(self.p_main,size=(300,-1)), flag=wx.ALIGN_CENTER)
-        sizer_s_top.Add(wx.Button(self.p_main,label='查询'), flag=wx.EXPAND | wx.ALL,border=40)
-
-        sizer_s.Add(sizer_s_top,flag=wx.EXPAND)
-        self.mul_text1 = wx.TextCtrl(self.p_main,style=wx.TE_MULTILINE|wx.TE_READONLY,size=(1,200))
-        sizer_s.Add(self.mul_text1,flag=wx.EXPAND|wx.ALL,border=10)
-
-        self.mul_text2 = wx.TextCtrl(self.p_main, style=wx.TE_MULTILINE | wx.TE_READONLY, size=(1, 200))
-        sizer_s.Add(self.mul_text2, flag=wx.EXPAND|wx.ALL,border=10)
-        self.p_main.SetSizer(sizer_s)
+        self.Bind(wx.EVT_BUTTON, self.OnClick)
 
     def OnClick(self, event):
-        self.mul_text1.AppendText("aAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        obj = event.GetEventObject().GetName()
+        # print(obj, self.main_index)
+        if obj == 'btn_search' and self.main_index != 0:
+            self.changePanel(0)
+        if obj == 'btn_check' and self.main_index != 1:
+            self.changePanel(1)
+        if obj == 'btn_updata' and self.main_index != 2:
+            self.changePanel(2)
+        if obj == 'btn_search_offline' and self.main_index != 3:
+            self.changePanel(3)
+
+    def changePanel(self, index):
+        # print(index)
+        # self.sp_main.Unsplit(toRemove=None)
+        # self.sp_main.SplitVertically(self.p_left, self.p_mains[index], sashPosition=self.GetSize()[0] / 6)
+        print(self.sp_main.GetWindow2())
+        self.sp_main.ReplaceWindow(self.sp_main.GetWindow2(),self.p_mains[index])
+        self.main_index = index
 
 
 class MyApp(wx.App):
