@@ -53,10 +53,10 @@ class MainScreen(wx.Frame):
 
     def changePanel(self, index):
         # print(index)
-        # self.sp_main.Unsplit(toRemove=None)
-        # self.sp_main.SplitVertically(self.p_left, self.p_mains[index], sashPosition=self.GetSize()[0] / 6)
-        print(self.sp_main.GetWindow2())
-        self.sp_main.ReplaceWindow(self.sp_main.GetWindow2(),self.p_mains[index])
+        self.sp_main.Unsplit(toRemove=None)
+        self.sp_main.SplitVertically(self.p_left, self.p_mains[index], sashPosition=self.GetSize()[0] / 6)
+        # self.sp_main.GetWindow2().Hide()
+        # self.sp_main.ReplaceWindow(self.sp_main.GetWindow2(),self.p_mains[index])
         self.main_index = index
 
 
