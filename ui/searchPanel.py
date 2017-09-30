@@ -15,7 +15,7 @@ class SearchPanel(wx.Panel):
         self.idText = wx.TextCtrl(self, size=(300, -1))
         sizer_s_top.Add(self.idText, flag=wx.ALIGN_CENTER)
         btn = wx.Button(self, label='查询',name='btn_search')
-        sizer_s_top.Add(btn, flag=wx.EXPAND | wx.ALL, border=40)
+        sizer_s_top.Add(btn, flag=wx.EXPAND | wx.ALL, border=20)
 
         self.sizer_s.Add(sizer_s_top, flag=wx.EXPAND)
         self.mul_text1 = wx.TextCtrl(self, style=wx.TE_MULTILINE | wx.TE_READONLY, size=(1, 200))

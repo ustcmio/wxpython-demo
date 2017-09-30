@@ -25,6 +25,7 @@ class LeftPanel(wx.Panel):
         self.sizer.Add(self.btn_s4, flag=wx.EXPAND)
         # sizer装入left_panel
         self.SetSizer(self.sizer)
+        self.sizer.Fit(self)
 
         # 绑定按键出发
         self.Bind(wx.EVT_BUTTON, None, self.btn_s1)

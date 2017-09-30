@@ -1,25 +1,30 @@
 import wx
-from searchPanel import SearchPanel
-from leftPanel import LeftPanel
-from checkPanel import CheckPanel
-from updataPanel import UpdataPanel
-from searchPanel_offline import SearchPanelByOffline
 
+from ui.searchPanel import SearchPanel
+from ui.leftPanel import LeftPanel
+from ui.checkPanel import CheckPanel
+from ui.updataPanel import UpdataPanel
+from ui.searchPanel_offline import SearchPanelByOffline
+
+from wx.lib.splitter import MultiSplitterWindow
 
 class MainScreen(wx.Frame):
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, size=wx.Size(1280, 800))
+        wx.Frame.__init__(self, parent, title=title, size=wx.Size(1280, 800),style=wx.DEFAULT_FRAME_STYLE)
         # 窗口居中
         self.CenterOnScreen()
         # 分割窗口
-        self.sp = wx.SplitterWindow(self)
+        self.sp = MultiSplitterWindow(self)
+        self.sp.SetOrientation(wx.VERTICAL)
+        self.Bind(wx.PyEventBinder(wx.wxEVT_SPLITTER_SASH_POS_CHANGING),self.sashchange)
         # Top窗口：panel
         self.p_top = wx.Panel(self.sp, style=wx.SUNKEN_BORDER)
         self.p_top.Hide()
         # 下部分窗口：左右分割的splitter
-        self.sp_main = wx.SplitterWindow(self.sp)
+        self.sp_main = MultiSplitterWindow(self.sp)
         # 上下两部分窗口填充
-        self.sp.SplitHorizontally(self.p_top, self.sp_main, sashPosition=self.GetSize()[1] / 6)
+        self.sp.AppendWindow(self.p_top, sashPos=self.GetSize()[1] / 6)
+        self.sp.AppendWindow(self.sp_main)
 
         # 下部分窗口的left:panel
         self.p_left = LeftPanel(self.sp_main, style=wx.SUNKEN_BORDER)
@@ -34,7 +39,9 @@ class MainScreen(wx.Frame):
             p.Hide()
 
         # 下部分窗口默认填充查询页面
-        self.sp_main.SplitVertically(self.p_left, self.p_mains[0], sashPosition=self.GetSize()[0] / 6)
+        self.sp_main.SetOrientation(wx.HORIZONTAL)
+        self.sp_main.AppendWindow(self.p_left, sashPos=self.GetSize()[0] / 6)
+        self.sp_main.AppendWindow(self.p_mains[0])
         self.main_index = 0
 
         self.Bind(wx.EVT_BUTTON, self.OnClick)
@@ -53,12 +60,15 @@ class MainScreen(wx.Frame):
 
     def changePanel(self, index):
         # print(index)
-        self.sp_main.Unsplit(toRemove=None)
-        self.sp_main.SplitVertically(self.p_left, self.p_mains[index], sashPosition=self.GetSize()[0] / 6)
-        # self.sp_main.GetWindow2().Hide()
-        # self.sp_main.ReplaceWindow(self.sp_main.GetWindow2(),self.p_mains[index])
+        # self.sp_main[self.main_index].Hide()
+        # self.sp_main.Unsplit(toRemove=None)
+        # self.sp_main.SplitVertically(self.p_left, self.p_mains[index], sashPosition=self.GetSize()[0] / 6)
+        self.sp_main.ReplaceWindow(self.p_mains[self.main_index], self.p_mains[index])
+        self.p_mains[self.main_index].Hide()
         self.main_index = index
 
+    def sashchange(self,e):
+        e.Veto()
 
 class MyApp(wx.App):
     def OnInit(self):
